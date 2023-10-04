@@ -4,9 +4,15 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import org.photonvision.PhotonCamera;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -18,6 +24,8 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
+
+  private PhotonCamera camera = new PhotonCamera("Arducam_OV9281_USB_Camera");
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -39,12 +47,30 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+    var result = camera.getLatestResult();
+
+    if (result.hasTargets()) {
+      PhotonTrackedTarget bestTarget = result.getBestTarget();
+
+      Transform3d targetPose = bestTarget.getBestCameraToTarget();
+      //List<TargetCorner> corners = bestTarget.getDetectedCorners();
+
+      SmartDashboard.putNumber("Target X", targetPose.getTranslation().getX());
+      SmartDashboard.putNumber("Target Y", targetPose.getTranslation().getY());
+      SmartDashboard.putNumber("Target Z", targetPose.getTranslation().getZ());
+
+      SmartDashboard.putNumber("Target Pitch", bestTarget.getPitch());
+      SmartDashboard.putNumber("Target Yaw", bestTarget.getYaw());
+      SmartDashboard.putNumber("Target Roll", bestTarget.getSkew());
+    } else {
+      SmartDashboard.putString("Target Status", "No target detected.");
+    }
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
-  }
+  } 
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
