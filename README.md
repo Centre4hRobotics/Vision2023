@@ -17,6 +17,7 @@
         10b) Assuming it did work, congratulations! Don't touch a thing unless you are being supervised by a person who **ABSOLUTELY KNOWS WHAT THEY ARE DOING**.
 
         P.S. If none of the steps above work, start from scratch you caveman. 
+        P.P.S The IP of the OrangePi (assuming vision23 is still using that board) should be 10.2.10.19
 
     Yours truly,
         The people who were responsible for the Vision23 codebase. We are not responsible for any headaches (TM).
