@@ -5,6 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -48,17 +49,19 @@ public class Robot extends TimedRobot {
 
     if (result.hasTargets()) {
       PhotonTrackedTarget bestTarget = result.getBestTarget();
-
       Transform3d targetPose = bestTarget.getBestCameraToTarget();
       //List<TargetCorner> corners = bestTarget.getDetectedCorners();
 
+      SmartDashboard.putString("Target Status", "Target detected.");
       SmartDashboard.putNumber("Target X", targetPose.getTranslation().getX());
       SmartDashboard.putNumber("Target Y", targetPose.getTranslation().getY());
       SmartDashboard.putNumber("Target Z", targetPose.getTranslation().getZ());
 
-      SmartDashboard.putNumber("Target Pitch", bestTarget.getPitch());
-      SmartDashboard.putNumber("Target Yaw", bestTarget.getYaw());
-      SmartDashboard.putNumber("Target Roll", bestTarget.getSkew());
+      SmartDashboard.putNumber("Target Pitch", Units.radiansToDegrees(targetPose.getRotation().getX()));
+      SmartDashboard.putNumber("Target Yaw", Units.radiansToDegrees(targetPose.getRotation().getY()));
+      SmartDashboard.putNumber("Target Roll", Units.radiansToDegrees(targetPose.getRotation().getZ()));
+
+      SmartDashboard.putNumber("AprilTag ID", bestTarget.getFiducialId());
     } else {
       SmartDashboard.putString("Target Status", "No target detected.");
     }
