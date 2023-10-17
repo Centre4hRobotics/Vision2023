@@ -57,9 +57,9 @@ public class Robot extends TimedRobot {
       SmartDashboard.putNumber("Target Y", targetPose.getTranslation().getY());
       SmartDashboard.putNumber("Target Z", targetPose.getTranslation().getZ());
 
-      SmartDashboard.putNumber("Target Pitch", Units.radiansToDegrees(targetPose.getRotation().getX()));
-      SmartDashboard.putNumber("Target Yaw", Units.radiansToDegrees(targetPose.getRotation().getY()));
-      SmartDashboard.putNumber("Target Roll", Units.radiansToDegrees(targetPose.getRotation().getZ()));
+      SmartDashboard.putNumber("Target Pitch", Units.radiansToDegrees(bestTarget.getPitch()));
+      SmartDashboard.putNumber("Target Yaw", Units.radiansToDegrees(bestTarget.getYaw()));
+      SmartDashboard.putNumber("Target Roll", Units.radiansToDegrees(bestTarget.getSkew())); // Hopefully, this is roll.
 
       SmartDashboard.putNumber("AprilTag ID", bestTarget.getFiducialId());
     } else {
