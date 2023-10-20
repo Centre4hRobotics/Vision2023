@@ -4,15 +4,20 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonTrackedTarget;
+
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -25,7 +30,25 @@ public class Robot extends TimedRobot {
   private RobotContainer m_robotContainer;
   private PhotonCamera camera = new PhotonCamera("Arducam_OV9281_USB_Camera");
 
-  /**
+  private final CANSparkMax _leftLeadMotor = new CANSparkMax(3, MotorType.kBrushless);
+  private final CANSparkMax _leftFollowMotor = new CANSparkMax(4, MotorType.kBrushless);
+  private final CANSparkMax _rightLeadMotor = new CANSparkMax(1, MotorType.kBrushless);
+  private final CANSparkMax _rightFollowMotor = new CANSparkMax(2, MotorType.kBrushless);
+  private final DifferentialDrive _drive = new DifferentialDrive(_leftLeadMotor, _rightLeadMotor);
+
+  final double CAMERA_HEIGHT_METERS = Units.inchesToMeters(24);
+  final double TARGET_HEIGHT_METERS = Units.feetToMeters(5);
+    // Angle between horizontal and the camera.
+  final double CAMERA_PITCH_RADIANS = Units.degreesToRadians(0);
+
+    // How far from the target we want to be
+  final double GOAL_RANGE_METERS = Units.feetToMeters(3);
+
+  final double ANGULAR_P = 0.09;
+  final double ANGULAR_D = 0.0;
+  PIDController turnController = new PIDController(ANGULAR_P, 0, ANGULAR_D);
+
+            /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
@@ -34,6 +57,20 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+
+    _leftLeadMotor.setSmartCurrentLimit(40);
+    _leftFollowMotor.setSmartCurrentLimit(40);
+    _rightLeadMotor.setSmartCurrentLimit(40);
+    _rightFollowMotor.setSmartCurrentLimit(40);
+        
+        
+        //Set lead and follow motors
+    _leftFollowMotor.follow(_leftLeadMotor);
+    _rightFollowMotor.follow(_rightLeadMotor);
+
+            //Left side needs inverted
+    _leftLeadMotor.setInverted(true);
+    _rightLeadMotor.setInverted(false);
   }
 
   /**
@@ -45,6 +82,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+    double rotationSpeed = 0.0;
     var result = camera.getLatestResult();
 
     if (result.hasTargets()) {
@@ -57,14 +95,20 @@ public class Robot extends TimedRobot {
       SmartDashboard.putNumber("Target Y", targetPose.getTranslation().getY());
       SmartDashboard.putNumber("Target Z", targetPose.getTranslation().getZ());
 
-      SmartDashboard.putNumber("Target Pitch", Units.radiansToDegrees(bestTarget.getPitch()));
-      SmartDashboard.putNumber("Target Yaw", Units.radiansToDegrees(bestTarget.getYaw()));
-      SmartDashboard.putNumber("Target Roll", Units.radiansToDegrees(bestTarget.getSkew())); // Hopefully, this is roll.
+      SmartDashboard.putNumber("Target Pitch", bestTarget.getPitch());
+      SmartDashboard.putNumber("Target Yaw", bestTarget.getYaw()); // We were converting degrees to degrees lmao
+      SmartDashboard.putNumber("Target Skew (?)", bestTarget.getSkew()); // Hopefully, this is roll.  Update: It was not roll.  We have no idea what this is.
 
       SmartDashboard.putNumber("AprilTag ID", bestTarget.getFiducialId());
+
+      rotationSpeed = turnController.calculate(bestTarget.getPitch() / 3.5, 0);
+
     } else {
       SmartDashboard.putString("Target Status", "No target detected.");
     }
+
+    _drive.arcadeDrive(0, rotationSpeed);
+
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
