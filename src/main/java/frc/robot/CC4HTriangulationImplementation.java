@@ -48,15 +48,15 @@ public class CC4HTriangulationImplementation {
      * @param VxSolverParameter     Parameters to feed into the solver.
      */
     CC4HTriangulationImplementation.CC4HInternalCartesianVector VxSolver(CC4HInternalVxVyInfo VxSolverParameters) {
-        a1 = VxSolverParameters.First_AprilTagLocalPosition.x;
-        b1 = VxSolverParameters.First_AprilTagLocalPosition.y;
-        a2 = VxSolverParameters.Second_AprilTagLocalPosition.x;
-        b2 = VxSolverParameters.Second_AprilTagLocalPosition.y;
+        double a1 = VxSolverParameters.First_AprilTagLocalPosition.x;
+        double b1 = VxSolverParameters.First_AprilTagLocalPosition.y;
+        double a2 = VxSolverParameters.Second_AprilTagLocalPosition.x;
+        double b2 = VxSolverParameters.Second_AprilTagLocalPosition.y;
 
-        x1 = VxSolverParameters.First_AprilTagAbsolutePosition.x;
-        y1 = VxSolverParameters.First_AprilTagAbsolutePosition.y;
-        x2 = VxSolverParameters.Second_AprilTagAbsolutePosition.x;
-        y2 = VxSolverParameters.Second_AprilTagAbsolutePosition.y;
+        double x1 = VxSolverParameters.First_AprilTagAbsolutePosition.x;
+        double y1 = VxSolverParameters.First_AprilTagAbsolutePosition.y;
+        double x2 = VxSolverParameters.Second_AprilTagAbsolutePosition.x;
+        double y2 = VxSolverParameters.Second_AprilTagAbsolutePosition.y;
 
         CC4HInternalCartesianVector Vx = new CC4HInternalCartesianVector();
         Vx.x = (b1*x2-b2*x1)/(b1*a2-b2*a1);
@@ -70,15 +70,15 @@ public class CC4HTriangulationImplementation {
      * @param VySolverParameter     Parameters to feed into the solver.
      */
     CC4HTriangulationImplementation.CC4HInternalCartesianVector VySolver(CC4HInternalVxVyInfo VySolverParameters) {
-        a1 = VxSolverParameters.First_AprilTagLocalPosition.x;
-        b1 = VxSolverParameters.First_AprilTagLocalPosition.y;
-        a2 = VxSolverParameters.Second_AprilTagLocalPosition.x;
-        b2 = VxSolverParameters.Second_AprilTagLocalPosition.y;
+        double a1 = VxSolverParameters.First_AprilTagLocalPosition.x;
+        double b1 = VxSolverParameters.First_AprilTagLocalPosition.y;
+        double a2 = VxSolverParameters.Second_AprilTagLocalPosition.x;
+        double b2 = VxSolverParameters.Second_AprilTagLocalPosition.y;
 
-        x1 = VxSolverParameters.First_AprilTagAbsolutePosition.x;
-        y1 = VxSolverParameters.First_AprilTagAbsolutePosition.y;
-        x2 = VxSolverParameters.Second_AprilTagAbsolutePosition.x;
-        y2 = VxSolverParameters.Second_AprilTagAbsolutePosition.y;
+        double x1 = VxSolverParameters.First_AprilTagAbsolutePosition.x;
+        double y1 = VxSolverParameters.First_AprilTagAbsolutePosition.y;
+        double x2 = VxSolverParameters.Second_AprilTagAbsolutePosition.x;
+        double y2 = VxSolverParameters.Second_AprilTagAbsolutePosition.y;
 
         CC4HInternalCartesianVector Vy = new CC4HInternalCartesianVector();
         Vy.x = (a1*x2-a2*x1)/(a1*b2-a2*b1);
@@ -96,7 +96,7 @@ public class CC4HTriangulationImplementation {
         double length = Math.sqrt(Vy.x**2 + Vy.y**2);
         return Math.arccos(Vy.y / length);
     }
-    
+
     public class TriangulationInputInfo {
         CC4HInternalCartesianVector AprilTagAbsolutePosition;
         CC4HInternalPolarVector AprilTagDistanceAndYaw;
@@ -117,6 +117,19 @@ public class CC4HTriangulationImplementation {
         CC4HInternalCartesianVector FirstAprilTagLocalCartesian = convertPolarToCartesian(FirstTriangulationInfo.AprilTagDistanceAndYaw);
         CC4HInternalCartesianVector SecondAprilTagLocalCartesian = convertPolarToCartesian(SecondTriangulationInfo.AprilTagDistanceAndYaw);
         CC4HInternalVxVyInfo VxVySolvingVectors = new CC4HInternalVxVyInfo(FirstAprilTagLocalCartesian, FirstTriangulationInfo, SecondAprilTagLocalCartesian, SecondTriangulationInfo);
-        //to finish Later™
+        
+        CC4HInternalCartesianVector Vx = VxSolver(VxVySolvingVectors);
+        CC4HInternalCartesianVector Vy = VySolver(VxVySolvingVectors);
+        
+        double theta = AngleBetweenAbsoluteYRelativeYSolver(Vy);
+        double x1 = VxSolverParameters.First_AprilTagAbsolutePosition.x;
+        double y1 = VxSolverParameters.First_AprilTagAbsolutePosition.y;
+        double d = FirstTriangulationInfo.AprilTagDistanceAndYaw.r;
+        double alpha = FirstTriangulationInfo.AprilTagDistanceAndYaw.theta;
+
+        CC4HInternalCartesianVector robotPosition = new CC4HInternalCartesianVector();
+        robotPosition.x = x1 - d * Math.sin(theta + alpha);
+        robotPosition.x = y1 - d * Math.cos(theta + alpha);
+        return robotPosition;
     }
 }
