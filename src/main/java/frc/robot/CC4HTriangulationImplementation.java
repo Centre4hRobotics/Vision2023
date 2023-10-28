@@ -122,8 +122,8 @@ public class CC4HTriangulationImplementation {
         CC4HInternalCartesianVector Vy = VySolver(VxVySolvingVectors);
         
         double theta = AngleBetweenAbsoluteYRelativeYSolver(Vy);
-        double x1 = VxSolverParameters.First_AprilTagAbsolutePosition.x;
-        double y1 = VxSolverParameters.First_AprilTagAbsolutePosition.y;
+        double x1 = FirstTriangulationInfo.AprilTagAbsolutePosition.x;
+        double y1 = FirstTriangulationInfo.AprilTagAbsolutePosition.y;
         double d = FirstTriangulationInfo.AprilTagDistanceAndYaw.r;
         double alpha = FirstTriangulationInfo.AprilTagDistanceAndYaw.theta;
 
