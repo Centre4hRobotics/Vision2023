@@ -6,18 +6,26 @@ import java.lang.Math;
 
 public class CC4HTriangulationImplementation {
     public class CC4HInternalPolarVector {
-        double r;
-        double theta; //if theta is the angle from the forward vector the calculations become easier, we use that here
+        public double r;
+        public double theta; //if theta is the angle from the forward vector the calculations become easier, we use that here
 
         public CC4HInternalPolarVector(double radius, double angle) {
             r = radius;
             theta = angle;
         }
+
+        public xVal() {
+            return polar.r * Math.sin( polar.theta );
+        }
+
+        public yVal() {
+            return polar.r * Math.cos( polar.theta );
+        }
     };
 
     public class CC4HInternalCartesianVector {
-        double x;
-        double y;
+        public double x;
+        public double y;
 
         public CC4HInternalCartesianVector(double xval, double yval) {
             x = xval;
@@ -26,10 +34,10 @@ public class CC4HTriangulationImplementation {
     };
 
     private class CC4HInternalVxVyInfo {
-        CC4HInternalCartesianVector firstAprilTagLocalPosition;
-        CC4HInternalCartesianVector firstAprilTagAbsolutePosition;
-        CC4HInternalCartesianVector secondAprilTagLocalPosition;
-        CC4HInternalCartesianVector secondAprilTagAbsolutePosition;
+        public CC4HInternalCartesianVector firstAprilTagLocalPosition;
+        public CC4HInternalCartesianVector firstAprilTagAbsolutePosition;
+        public CC4HInternalCartesianVector secondAprilTagLocalPosition;
+        public CC4HInternalCartesianVector secondAprilTagAbsolutePosition;
 
         public CC4HInternalVxVyInfo(CC4HInternalCartesianVector firstLocalPosition, TriangulationInputInfo firstAprilTagInput, CC4HInternalCartesianVector secondLocalPosition, TriangulationInputInfo secondAprilTagInput) {
             firstAprilTagLocalPosition = firstLocalPosition;
@@ -38,17 +46,6 @@ public class CC4HTriangulationImplementation {
             secondAprilTagAbsolutePosition = secondAprilTagInput.aprilTagAbsolutePosition;
         }
     };
-
-    /*
-     * Converts polar vector to cartesian vector.
-     * Programmer's note: Probably a more object-oriented way to do this >_>
-     * 
-     * @param polar     Polar vector to convert
-     */
-    private CC4HTriangulationImplementation.CC4HInternalCartesianVector convertPolarToCartesian(CC4HInternalPolarVector polar) {
-        CC4HInternalCartesianVector cartesian = new CC4HInternalCartesianVector( polar.r * Math.sin( polar.theta ) , polar.r * Math.cos( polar.theta ) );
-        return cartesian;
-    }
 
     /*
      * Solves for Vx (the unit vector moving rightwards relative to the robot) in absolute coordinates.
@@ -102,8 +99,8 @@ public class CC4HTriangulationImplementation {
     }
 
     public class TriangulationInputInfo {
-        CC4HInternalCartesianVector aprilTagAbsolutePosition;
-        CC4HInternalPolarVector aprilTagDistanceAndYaw;
+        public CC4HInternalCartesianVector aprilTagAbsolutePosition;
+        public CC4HInternalPolarVector aprilTagDistanceAndYaw;
 
         public TriangulationInputInfo(CC4HInternalCartesianVector absolute, CC4HInternalPolarVector distanceyaw) {
             aprilTagAbsolutePosition = absolute;
@@ -112,8 +109,8 @@ public class CC4HTriangulationImplementation {
     };
 
     public class TriangulationOutputInfo {
-        double xResult;
-        double yResult;
+        public double xResult;
+        public double yResult;
 
         public TriangulationOutputInfo(double xval, double yval) {
             xResult = xval;
