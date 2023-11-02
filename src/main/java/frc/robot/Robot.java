@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+import java.util.List;
 import java.util.stream.BaseStream;
 
 import org.photonvision.PhotonCamera;
@@ -107,23 +108,33 @@ public class Robot extends TimedRobot {
 
       SmartDashboard.putNumber("AprilTag ID", bestTarget.getFiducialId());
 
-      rotationSpeed = turnController.calculate(bestTarget.getPitch() / 3.5, 0);
+      // rotationSpeed = turnController.calculate(bestTarget.getPitch() / 3.5, 0);
 
-      //placeholder shenanigans
-      Translation2d absolute1 = new Translation2d(3.0, 7.0); //placeholder values, should have exact AprilTag coordinates
-      Translation2d absolute2 = new Translation2d(0.0, 9.0); //placeholder values, should have exact AprilTag coordinates
+      // Get the list of tracked targets by Photonvision
+      List<PhotonTrackedTarget> targets = result.getTargets();
 
-      double flat1 = 7.0; //more placeholder!!!
-      double flat2 = 10.0; //even more placeholder!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      // We need more than 2 targets in order to do any sort of triangulation.  It makes no sense to try to do this without two or more april tags.
+      if (targets.size() >= 2) {
+        Transform3d target1Pose = targets.get(0).getBestCameraToTarget();
+        Transform3d target2Pose = targets.get(1).getBestCameraToTarget();
 
-      double yaw1 = 1.0; //placeholder dont panic
-      double yaw2 = 2.0; //placeholder do panic
+        Translation2d absolute1 = new Translation2d(1.0, 2.5); 
+        Translation2d absolute2 = new Translation2d(-1.0, 2.5); 
 
-      CC4HTriangulationImplementation.TriangulationInputInfo info1 = new CC4HTriangulationImplementation().NastyInputInfoCavemanBrainedHack(absolute1, flat1, yaw1);
-      CC4HTriangulationImplementation.TriangulationInputInfo info2 = new CC4HTriangulationImplementation().NastyInputInfoCavemanBrainedHack(absolute2, flat2, yaw2);
+        double flat1 = Math.sqrt(Math.pow(target1Pose.getX(), 2.0) + Math.pow(target1Pose.getY(), 2.0)); //more placeholder!!!
+        double flat2 = Math.sqrt(Math.pow(target1Pose.getX(), 2.0) + Math.pow(target1Pose.getY(), 2.0)); //even more placeholder!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-      new CC4HTriangulationImplementation().calculateTriangulationVector(info1, info2);
+        double yaw1 = targets.get(0).getYaw(); //placeholder dont panic
+        double yaw2 = targets.get(1).getYaw(); //placeholder do panic
 
+        CC4HTriangulationImplementation.TriangulationInputInfo info1 = new CC4HTriangulationImplementation().NastyInputInfoCavemanBrainedHack(absolute1, flat1, yaw1);
+        CC4HTriangulationImplementation.TriangulationInputInfo info2 = new CC4HTriangulationImplementation().NastyInputInfoCavemanBrainedHack(absolute2, flat2, yaw2);
+
+        Transform2d robotTransform = new CC4HTriangulationImplementation().calculateTriangulationVector(info1, info2);
+
+        SmartDashboard.putNumber("Robot X", robotTransform.getX());
+        SmartDashboard.putNumber("Robot Y", robotTransform.getY());
+      }
     } else {
       SmartDashboard.putString("Target Status", "No target detected.");
     }
