@@ -1,7 +1,7 @@
 package frc.robot;
+import java.lang.Math.*;
 
-import edu.wpi.first.math.*;
-import java.lang.Math;
+import edu.wpi.first.math.geometry.*;
 
 
 public class CC4HTriangulationImplementation {
@@ -14,12 +14,11 @@ public class CC4HTriangulationImplementation {
             theta = angle;
         }
 
-        public xVal() {
-            return polar.r * Math.sin( polar.theta );
-        }
-
-        public yVal() {
-            return polar.r * Math.cos( polar.theta );
+        /*
+         * Converts a polar vector to a cartesian one, with theta configured as the interpretation written above.
+         */
+        public CC4HInternalCartesianVector convertPolarToCartesian() {
+            return new CC4HInternalCartesianVector(this.r * Math.sin( this.theta ), this.r * Math.cos( this.theta ));
         }
     };
 
@@ -27,9 +26,19 @@ public class CC4HTriangulationImplementation {
         public double x;
         public double y;
 
+        /*
+         * Constructor for the vector (cartesian edition)
+         * 
+         * @param xval    This is the x-value of the vector.
+         * @param yval    This is the y-value of the vector.
+         */
         public CC4HInternalCartesianVector(double xval, double yval) {
             x = xval;
             y = yval;
+        }
+        
+        public Translation2d convertCartesianToTranslation2d() {
+            return new Translation2d(this.x, this.y);
         }
     };
 
@@ -38,7 +47,15 @@ public class CC4HTriangulationImplementation {
         public CC4HInternalCartesianVector firstAprilTagAbsolutePosition;
         public CC4HInternalCartesianVector secondAprilTagLocalPosition;
         public CC4HInternalCartesianVector secondAprilTagAbsolutePosition;
-
+        
+        /*
+         * Constructor for CC4HInternalVxVyInfo!
+         * 
+         * @param firstLocalPosition    The local position of the first AprilTag.
+         * @param firstAprilTagInput    Used for the absolute position of the first AprilTag.
+         * @param secondLocalPosition    The local position of the second AprilTag.
+         * @param secondAprilTagInput    Used for the absolute position of the second AprilTag.
+         */
         public CC4HInternalVxVyInfo(CC4HInternalCartesianVector firstLocalPosition, TriangulationInputInfo firstAprilTagInput, CC4HInternalCartesianVector secondLocalPosition, TriangulationInputInfo secondAprilTagInput) {
             firstAprilTagLocalPosition = firstLocalPosition;
             firstAprilTagAbsolutePosition = firstAprilTagInput.aprilTagAbsolutePosition;
@@ -102,21 +119,29 @@ public class CC4HTriangulationImplementation {
         public CC4HInternalCartesianVector aprilTagAbsolutePosition;
         public CC4HInternalPolarVector aprilTagDistanceAndYaw;
 
+        /*
+        * Class constructor.
+        * 
+        * @param absolute     Absolute position of AprilTag.
+        * @param distanceyaw  Local (polar) position of the AprilTag.
+        */
         public TriangulationInputInfo(CC4HInternalCartesianVector absolute, CC4HInternalPolarVector distanceyaw) {
             aprilTagAbsolutePosition = absolute;
             aprilTagDistanceAndYaw = distanceyaw;
         }
     };
 
-    public class TriangulationOutputInfo {
-        public double xResult;
-        public double yResult;
-
-        public TriangulationOutputInfo(double xval, double yval) {
-            xResult = xval;
-            yResult = yval;
-        }
-    };
+    /*
+     * Creates the input info using external types (ew, disgusting).
+     * 
+     * @param absolute       The absolute AprilTag position as a Translation2d.
+     * @param distanceFlattened       "Flattened" distance of AprilTag from robot.
+     * @param yaw   Yaw of AprilTag from PhotonVision.
+     */
+    public TriangulationInputInfo NastyInputInfoCavemanBrainedHack(Translation2d absolute, double distanceFlattened, double yaw) {
+        return new TriangulationInputInfo(new CC4HInternalCartesianVector(absolute.getX(), absolute.getY()), 
+                                          new CC4HInternalPolarVector(distanceFlattened, yaw) );
+    }
 
     /*
      * The one function to kick the whole process off.
@@ -124,12 +149,12 @@ public class CC4HTriangulationImplementation {
      * @param firstTriangulationInfo       The input information for the first AprilTag.
      * @param secondTriangulationInfo       The input information for the second AprilTag.
      */
-    public CC4HTriangulationImplementation.TriangulationOutputInfo calculateTriangulationVector(TriangulationInputInfo firstTriangulationInfo, TriangulationInputInfo secondTriangulationInfo) {
-        CC4HInternalCartesianVector firstAprilTagLocalCartesian = convertPolarToCartesian(firstTriangulationInfo.aprilTagDistanceAndYaw);
-        CC4HInternalCartesianVector secondAprilTagLocalCartesian = convertPolarToCartesian(secondTriangulationInfo.aprilTagDistanceAndYaw);
+    public Transform2d calculateTriangulationVector(TriangulationInputInfo firstTriangulationInfo, TriangulationInputInfo secondTriangulationInfo) {
+        CC4HInternalCartesianVector firstAprilTagLocalCartesian = firstTriangulationInfo.aprilTagDistanceAndYaw.convertPolarToCartesian();
+        CC4HInternalCartesianVector secondAprilTagLocalCartesian = secondTriangulationInfo.aprilTagDistanceAndYaw.convertPolarToCartesian();
         CC4HInternalVxVyInfo VxVySolvingVectors = new CC4HInternalVxVyInfo(firstAprilTagLocalCartesian, firstTriangulationInfo, secondAprilTagLocalCartesian, secondTriangulationInfo);
         
-        CC4HInternalCartesianVector Vx = VxSolver(VxVySolvingVectors);
+        //CC4HInternalCartesianVector Vx = VxSolver(VxVySolvingVectors); //this might be needed in the future
         CC4HInternalCartesianVector Vy = VySolver(VxVySolvingVectors);
         
         double theta = angleBetweenAbsoluteYRelativeYSolver(Vy);
@@ -138,7 +163,7 @@ public class CC4HTriangulationImplementation {
         double d = firstTriangulationInfo.aprilTagDistanceAndYaw.r;
         double alpha = firstTriangulationInfo.aprilTagDistanceAndYaw.theta;
 
-        TriangulationOutputInfo robotPosition = new TriangulationOutputInfo(x1 - d * Math.sin(theta + alpha),  y1 - d * Math.cos(theta + alpha));
-        return robotPosition;
+        CC4HInternalCartesianVector robotPosition = new CC4HInternalCartesianVector(x1 - d * Math.sin(theta + alpha),  y1 - d * Math.cos(theta + alpha));
+        return new Transform2d(robotPosition.convertCartesianToTranslation2d(), new Rotation2d(theta));
     }
 }

@@ -13,11 +13,17 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import java.util.stream.BaseStream;
+
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
+import frc.robot.CC4HTriangulationImplementation;
+import edu.wpi.first.math.geometry.*;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -102,6 +108,21 @@ public class Robot extends TimedRobot {
       SmartDashboard.putNumber("AprilTag ID", bestTarget.getFiducialId());
 
       rotationSpeed = turnController.calculate(bestTarget.getPitch() / 3.5, 0);
+
+      //placeholder shenanigans
+      Translation2d absolute1 = new Translation2d(3.0, 7.0); //placeholder values, should have exact AprilTag coordinates
+      Translation2d absolute2 = new Translation2d(0.0, 9.0); //placeholder values, should have exact AprilTag coordinates
+
+      double flat1 = 7.0; //more placeholder!!!
+      double flat2 = 10.0; //even more placeholder!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+      double yaw1 = 1.0; //placeholder dont panic
+      double yaw2 = 2.0; //placeholder do panic
+
+      CC4HTriangulationImplementation.TriangulationInputInfo info1 = new CC4HTriangulationImplementation().NastyInputInfoCavemanBrainedHack(absolute1, flat1, yaw1);
+      CC4HTriangulationImplementation.TriangulationInputInfo info2 = new CC4HTriangulationImplementation().NastyInputInfoCavemanBrainedHack(absolute2, flat2, yaw2);
+
+      new CC4HTriangulationImplementation().calculateTriangulationVector(info1, info2);
 
     } else {
       SmartDashboard.putString("Target Status", "No target detected.");
