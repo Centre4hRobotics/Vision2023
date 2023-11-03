@@ -80,7 +80,7 @@ public class CC4HTriangulationImplementation {
         double x2 = VxSolverParameters.secondAprilTagAbsolutePosition.x;
         double y2 = VxSolverParameters.secondAprilTagAbsolutePosition.y;
 
-        CC4HInternalCartesianVector Vx = new CC4HInternalCartesianVector( (b1*x2-b2*x1)/(b1*a2-b2*a1) , (b1*y2-b2*y1)/(b1*a2-b2*a1) );
+        CC4HInternalCartesianVector Vx = new CC4HInternalCartesianVector( (b1 * x2 - b2 * x1) / (b1 * a2 - b2 * a1) , (b1 * y2 - b2 * y1) / (b1 * a2 - b2 * a1) );
         return Vx;
     }
 
@@ -100,7 +100,7 @@ public class CC4HTriangulationImplementation {
         double x2 = VySolverParameters.secondAprilTagAbsolutePosition.x;
         double y2 = VySolverParameters.secondAprilTagAbsolutePosition.y;
 
-        CC4HInternalCartesianVector Vy = new CC4HInternalCartesianVector( (a1*x2-a2*x1)/(a1*b2-a2*b1) , (a1*y2-a2*y1)/(a1*b2-a2*b1) );
+        CC4HInternalCartesianVector Vy = new CC4HInternalCartesianVector( (a1 * x2 - a2 * x1) / (a1 * b2 - a2 * b1) , (a1 * y2 - a2 * y1) / (a1 * b2 - a2 * b1) );
         return Vy;
     }
 

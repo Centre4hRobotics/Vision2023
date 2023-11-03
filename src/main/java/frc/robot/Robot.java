@@ -97,16 +97,16 @@ public class Robot extends TimedRobot {
       Transform3d targetPose = bestTarget.getBestCameraToTarget();
       //List<TargetCorner> corners = bestTarget.getDetectedCorners();
 
-      SmartDashboard.putString("Target Status", "Target detected.");
-      SmartDashboard.putNumber("Target X", targetPose.getTranslation().getX());
-      SmartDashboard.putNumber("Target Y", targetPose.getTranslation().getY());
-      SmartDashboard.putNumber("Target Z", targetPose.getTranslation().getZ());
+      // SmartDashboard.putString("Target Status", "Target detected.");
+      // SmartDashboard.putNumber("Target X", targetPose.getTranslation().getX());
+      // SmartDashboard.putNumber("Target Y", targetPose.getTranslation().getY());
+      // SmartDashboard.putNumber("Target Z", targetPose.getTranslation().getZ());
 
-      SmartDashboard.putNumber("Target Pitch", bestTarget.getPitch());
-      SmartDashboard.putNumber("Target Yaw", bestTarget.getYaw()); // We were converting degrees to degrees lmao
-      SmartDashboard.putNumber("Target Skew (?)", bestTarget.getSkew()); // Hopefully, this is roll.  Update: It was not roll.  We have no idea what this is.
+      // SmartDashboard.putNumber("Target Pitch", bestTarget.getPitch());
+      // SmartDashboard.putNumber("Target Yaw", bestTarget.getYaw()); // We were converting degrees to degrees lmao
+      // SmartDashboard.putNumber("Target Skew (?)", bestTarget.getSkew()); // Hopefully, this is roll.  Update: It was not roll.  We have no idea what this is.
 
-      SmartDashboard.putNumber("AprilTag ID", bestTarget.getFiducialId());
+      // SmartDashboard.putNumber("AprilTag ID", bestTarget.getFiducialId());
 
       // rotationSpeed = turnController.calculate(bestTarget.getPitch() / 3.5, 0);
 
@@ -118,11 +118,14 @@ public class Robot extends TimedRobot {
         Transform3d target1Pose = targets.get(0).getBestCameraToTarget();
         Transform3d target2Pose = targets.get(1).getBestCameraToTarget();
 
-        Translation2d absolute1 = new Translation2d(1.0, 2.5); 
-        Translation2d absolute2 = new Translation2d(-1.0, 2.5); 
+        Translation2d absolute1 = new Translation2d(0.5, 2.5); 
+        Translation2d absolute2 = new Translation2d(-0.5, 2.5); 
 
-        double flat1 = Math.sqrt(Math.pow(target1Pose.getX(), 2.0) + Math.pow(target1Pose.getY(), 2.0)); //more placeholder!!!
-        double flat2 = Math.sqrt(Math.pow(target1Pose.getX(), 2.0) + Math.pow(target1Pose.getY(), 2.0)); //even more placeholder!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // SmartDashboard.putString("Target 1: ", String.format("X: %f, Y: %f", target1Pose.getX(), target1Pose.getZ()));
+        // SmartDashboard.putString("Target 2: ", String.format("X: %f, Y: %f", target2Pose.getX(), target2Pose.getZ()));
+
+        double flat1 = Math.sqrt(Math.pow(target1Pose.getX(), 2.0) + Math.pow(target1Pose.getZ(), 2.0)); //more placeholder!!!
+        double flat2 = Math.sqrt(Math.pow(target2Pose.getX(), 2.0) + Math.pow(target2Pose.getZ(), 2.0)); //even more placeholder!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
         double yaw1 = targets.get(0).getYaw(); //placeholder dont panic
         double yaw2 = targets.get(1).getYaw(); //placeholder do panic
